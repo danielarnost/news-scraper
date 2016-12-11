@@ -46,9 +46,6 @@ db.once("open", function() {
   console.log("Mongoose connection successful.");
 });
 
-
-
-
 // Routes
 // ======
 app.get("/", function(req, res) {
@@ -57,13 +54,9 @@ app.get("/", function(req, res) {
 
 
 app.get("/scrape", function(req, res) {
-
-  request("https://news.ycombinator.com/", function(error, response, html) {
-  
-    var $ = cheerio.load(html);
- 
-    $("td.title").each(function(i, element) {
-     
+  request("https://news.ycombinator.com/", function(error, response, html) {  
+    var $ = cheerio.load(html); 
+    $("td.title").each(function(i, element) {     
       var result = {};
    
 
@@ -74,14 +67,11 @@ result.title = $(this).children("a").text();
 
 
 var entry = new Article(result);
-
       var entry = new Article(result);
-        entry.save(function(err, doc) {
-      
+        entry.save(function(err, doc) {      
         if (err) {
           console.log(err);
-        }
-        
+        }        
         else {
           console.log(doc);
         }
@@ -94,13 +84,10 @@ var entry = new Article(result);
 
 
 app.get("/articles", function(req, res) {
-
   Article.find({}, function(error, doc) {
-
     if (error) {
       console.log(error);
-    }
- 
+    } 
     else {
       res.json(doc);
     }
@@ -109,17 +96,12 @@ app.get("/articles", function(req, res) {
 
 
 app.get("/articles/:id", function(req, res) {
-
 Article.findOne({ "_id": req.params.id })
-
 .populate("note")
-
 .exec(function(error, doc) {
-
 if (error) {
       console.log(error);
-    }
-    
+    }    
     else {
       res.json(doc);
     }
@@ -128,28 +110,19 @@ if (error) {
 
 
 
-app.post("/articles/:id", function(req, res) {
-  
-  var newNote = new Note(req.body);
-
- 
-  newNote.save(function(error, doc) {
-   
+app.post("/articles/:id", function(req, res) {  
+  var newNote = new Note(req.body); 
+  newNote.save(function(error, doc) {   
     if (error) {
       console.log(error);
-    }
-    
-    else {
-      
+    }    
+    else {      
       Article.findOneAndUpdate({ "_id": req.params.id }, { "note": doc._id })
-     
-      .exec(function(err, doc) {
-       
+           .exec(function(err, doc) {       
         if (err) {
           console.log(err);
         }
-        else {
-          
+        else {          
           res.send(doc);
         }
       });
@@ -157,8 +130,6 @@ app.post("/articles/:id", function(req, res) {
   });
 });
 
-
-// Listen on port 3000
 app.listen(3000, function() {
   console.log("App running on port 3000!");
 });
